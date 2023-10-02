@@ -8,8 +8,7 @@ app = FastAPI()
 
 df1 = pd.read_csv('df1.csv')
 df2 = pd.read_csv('df2.csv')
-df3 = pd.read_csv('df3.csv')
-df4 = pd.read_csv('df4.csv')
+
 df5 = pd.read_csv('df5.csv')
 
 
