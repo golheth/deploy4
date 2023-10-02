@@ -127,60 +127,7 @@ async def usuario_mas_horas(genero: str):
     return resultado
 
 
-def UsersRecommend(año: int):
-    # Filtra las revisiones para el año dado y comentarios positivos/neutrales, luego ordena por puntaje
-    top_3_juegos = df3[(df3['release_date'].dt.year == año) & (df3['puntaje'] >= 0)]\
-        .sort_values(by='puntaje', ascending=False).head(3)
 
-    # Crea una lista de diccionarios en el formato deseado
-    resultados = [{"Puesto {}: {}".format(i+1, juego['game']): juego['puntaje']} for i, (_, juego) in enumerate(top_3_juegos.iterrows())]
-
-    return resultados
-
-@app.get("/mejores_recomendaciones/{año}")
-async def mejores_recomendaciones(año: int):
-    resultado = UsersRecommend(año)
-    return resultado
-
-def UsersNotRecommend(año: int):
-    # Filtra las revisiones para el año dado, comentarios negativos y no recomendados, luego ordena por puntaje
-    top_3_juegos = df3[(df3['release_date'].dt.year == año) & (df3['puntaje'] < 0)]\
-        .sort_values(by='puntaje', ascending=True).head(3)
-
-    # Crea una lista de diccionarios en el formato deseado
-    resultados = [{"Puesto {}: {}".format(i+1, juego['game']): juego['puntaje']} for i, (_, juego) in enumerate(top_3_juegos.iterrows())]
-
-    return resultados
-
-# Ejemplo de uso:
-@app.get("/peores_recomendaciones/{año}")
-async def peores_recomendaciones(año: int):
-    resultado = UsersNotRecommend(año)
-    return resultado 
-
-def sentiment_analysis(año: int):
-    # Filtra las reseñas para el año dado
-    reseñas_por_año = df4[df4['release_date'].dt.year == año]
-
-    # Calcula la cantidad de registros para cada categoría de sentimiento
-    cantidad_negativos = (reseñas_por_año['sentiment_neg'] == 1).sum()
-    cantidad_neutrales = (reseñas_por_año['sentiment_neu'] == 1).sum()
-    cantidad_positivos = (reseñas_por_año['sentiment_pos'] == 1).sum()
-
-    # Crea un diccionario con los resultados
-    resultados = {
-        'Negative': cantidad_negativos,
-        'Neutral': cantidad_neutrales,
-        'Positive': cantidad_positivos
-    }
-
-    return resultados
-
-# Ejemplo de uso:
-@app.get("/analisis_sentimiento/{año}")
-async def analisis_sentimiento(año: int):
-    resultado = sentiment_analysis(año)
-    return resultado
 
 
 if __name__ == "__main__":
