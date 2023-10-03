@@ -64,25 +64,24 @@ async def recomendacion_juego(nombre_producto: str):
     return {"Recomendaciones": recommendations}
 
 
-
-def PlayTimeGenre(genero: str):
+def PlayTimeGenre(df, genero):
     # Convertir el género ingresado a minúsculas
     genero = genero.lower()
 
     # Filtrar el DataFrame para el género especificado
-    df_genero = df1[df1[genero] == 1]
+    df_genero = df[df[genero] == 1]
 
     # Agrupar por año y calcular las horas totales jugadas
-    df_grouped = df_genero.groupby(df_genero['release_date'].dt.year)['playtime_forever'].sum()
+    df_grouped = df_genero.groupby(df_genero['year'])['playtime_forever'].sum()
 
     # Encontrar el año con más horas jugadas
     año_mas_horas = df_grouped.idxmax()
 
-    # Devolver el resultado como un diccionario con el año como int
-    resultado = {f"Año de lanzamiento con más horas jugadas para {genero}": int(año_mas_horas)}
+    # Devolver el año como un entero
+    return año_mas_horas
 
-    return resultado
-
+anio_mas_horas = PlayTimeGenre(df1, 'action')
+print(anio_mas_horas)  # Esto imprimirá el año como un entero
 # Ejemplo de uso:
 @app.get("/anio_mas_horas/{genero}")
 async def anio_mas_horas(genero: str):
