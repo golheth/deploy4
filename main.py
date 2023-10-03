@@ -47,6 +47,7 @@ categories = df5[['adventure',
  'video production']]
 
 def get_recommendations(game_name):
+    game_name = game_name.lower()  # Convierte el nombre del juego a minúscula
     game_index = df5[df5['game'] == game_name].index
     if len(game_index) == 0:
         return []
