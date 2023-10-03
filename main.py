@@ -6,7 +6,7 @@ from fastapi import FastAPI
 app = FastAPI()
 
 
-df1 = pd.read_csv('df1.csv')
+
 df2 = pd.read_csv('df2.csv')
 
 df5 = pd.read_csv('df5.csv')
@@ -20,7 +20,8 @@ df5 = pd.read_csv('df5.csv')
 # Tu código para cargar datos y definir la función get_recommendations aquí
 
 
-
+generos = ['adventure', 'software training', 'photo editing', 'indie', 'education', 'action', 'animation &amp; modeling', 'early access', 'free to play', 'audio production', 'massively multiplayer', 'design &amp; illustration', 'utilities', 'sports', 'racing', 'rpg', 'accounting', 'simulation', 'casual', 'strategy', 'video production']
+annios= ['2008','2014','2016','2010','2013','2006','2013','2016','2006','2014','2005','2015','2015','2015','2016','2008','0','2008','2009','2017','2014']
 
 
 categories = df5[['adventure',
@@ -64,29 +65,21 @@ async def recomendacion_juego(nombre_producto: str):
     return {"Recomendaciones": recommendations}
 
 
-def PlayTimeGenre(df, genero):
-    # Convertir el género ingresado a minúsculas
-    genero = genero.lower()
-
-    # Filtrar el DataFrame para el género especificado
-    df_genero = df[df[genero] == 1]
-
-    # Agrupar por año y calcular las horas totales jugadas
-    df_grouped = df_genero.groupby(df_genero['year'])['playtime_forever'].sum()
-
-    # Encontrar el año con más horas jugadas
-    año_mas_horas = df_grouped.idxmax()
-
-    # Devolver el año como un entero
-    return año_mas_horas
-
-anio_mas_horas = PlayTimeGenre(df1, 'action')
-print(anio_mas_horas)  # Esto imprimirá el año como un entero
-# Ejemplo de uso:
-@app.get("/anio_mas_horas/{genero}")
-async def anio_mas_horas(genero: str):
-    resultado = PlayTimeGenre(df1, genero)
-    return resultado
+@app.get("/playtime/{genero}")
+def PlayTimeGenre(genero: str):
+    if genero not in generos:
+        return {"message": f"No se encontraron registros para el género {genero}"}
+    
+    # Filtrar la lista para obtener los años correspondientes al género dado
+    anos_filtrados = [ano for i, ano in enumerate(annios) if generos[i] == genero]
+    
+    if not anos_filtrados:
+        return {"message": f"No se encontraron registros para el género {genero}"}
+    
+    # Encontrar el año con más horas jugadas para ese género
+    ano_mas_horas = max(anos_filtrados, key=anos_filtrados.count)
+    
+    return {"Año de lanzamiento con más horas jugadas para Género": genero, "Año": int(ano_mas_horas)}
 
 
 
