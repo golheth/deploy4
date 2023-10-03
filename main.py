@@ -85,25 +85,17 @@ def PlayTimeGenre(genero: str):
 
 
 def UserForGenre(df, genero):
-    # Convertir el género ingresado a minúsculas
     genero = genero.lower()
-
-    # Filtrar el DataFrame para el género especificado
-    df_genero = df[df[genero] == 1]
+    df_genero = df[df['genero'].str.lower() == genero]
 
     if df_genero.empty:
-        return {}  # No se encontraron datos para el género dado
+        return {"error": f"No data found for genre {genero}"}
 
-    # Encontrar el usuario con más horas jugadas para el género
     usuario_mas_horas = df_genero.groupby('user_id')['playtime_forever'].sum().idxmax()
-
-    # Filtrar el DataFrame para el usuario con más horas jugadas
     df_usuario_mas_horas = df_genero[df_genero['user_id'] == usuario_mas_horas]
 
-    # Agrupar por año y calcular las horas totales jugadas por año
     df_year_grouped = df_usuario_mas_horas.groupby(df_usuario_mas_horas['release_date'].dt.year)['playtime_forever'].sum().reset_index()
 
-    # Crear el resultado como un diccionario en el formato deseado
     resultado = {
         f"Usuario con más horas jugadas para Género {genero}": usuario_mas_horas,
         "Horas jugadas": df_year_grouped.rename(columns={'release_date': 'Año', 'playtime_forever': 'Horas'}).to_dict(orient='records')
@@ -111,11 +103,14 @@ def UserForGenre(df, genero):
 
     return resultado
 
-# Ejemplo de uso:
 @app.get("/usuario_mas_horas/{genero}")
 async def usuario_mas_horas(genero: str):
-    resultado = UserForGenre(df2, genero)
-    return resultado
+    try:
+        resultado = UserForGenre(df2, genero)
+        return resultado
+    except Exception as e:
+        print("Error:", str(e))
+        return {"error": "Internal Server Error"}
 
 
 
